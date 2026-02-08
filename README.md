@@ -40,3 +40,7 @@ Add these to your Arduino IDE Preferences (`File > Preferences`):
 2.  **Board Selection:** Select your specific Xiao ESP32S3 or Xiao ESP32C3 board in the IDE.
 3.  **Flash:** Upload the code to your robot.
 4.  **Pairing:** Put your Xbox controller into sync mode. The Xiao will automatically handshake with the first available BLE controller.
+
+## Viewing Code
+* `To see the code of all my robots that use ESP32 Xiao (Or just ESP32), click view branches and select the robot you want to see code for.
+
