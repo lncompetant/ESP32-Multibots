@@ -7,9 +7,7 @@ Servo escRight;   // Right wheel motor
 const int driftoffset = 30;  //amount to offset joystick drift by
 bool controllerConnected = false;
 const float sensitivityPercentage = 0.50;  //permanent sensitivity modifier
-float speedSensitivity = 0.5; //temp value to change speed mid fight
-float turnSensitivity = 1; //temp value to change turn sensitivity mid fight
-int inversion = 1;  //if the bot is flipped
+int exponentialScale =1; //starts at 3 and increasing will increase the exponent by +2
 
 // Motor control pins
 const int leftPin = D9;
@@ -30,7 +28,6 @@ void armESC();
 const int ledPin = D0;  // the number of the power LED pin
 
 // constants won't change:
-const long interval = 1000;  // interval at which to blink (milliseconds)
 void setup() {
   Serial.begin(115200);
 
@@ -95,18 +92,19 @@ void onDisconnectedController(ControllerPtr ctl) {
 
 void processJoysticks(ControllerPtr ctl) {
   // Control the wheels using the joystick
-  int leftyAxis = ctl->axisY();    // Assuming this is the Y-axis for forward/backward
-  int rightxAxis = ctl->axisRX();  // Assuming this is the X-axis for left/right
-  int rightyAxis = ctl->axisRY();
-  //int RawRightYaxis = ctl->axisRY();
+  int leftyAxis = ctl->axisY();    // Assuming this is the Y-axis for the left side
+  int rightyAxis = ctl->axisRY(); 
   int processedRight;
   int processedLeft;
   int mappedRight;
   int mappedLeft;
- 
-// the sign in front inverts the whole control, the sign after the leftyAxis inverts the turn
-  processedLeft = inversion*(leftyAxis*speedSensitivity - (rightxAxis * sensitivityPercentage*turnSensitivity));
-  processedRight = -inversion*(leftyAxis*speedSensitivity + (rightxAxis * sensitivityPercentage*turnSensitivity));
+  
+  float scalableLeft = map(leftyAxis, -512, 512, -1, 1);
+  processedLeft = pow(scalableLeft,3);//Convert linear scale to a cubic scale using the same X value to get a different Y value on a graph
+
+  float scalableRight = map(rightyAxis, -512, 512, -1, 1);
+  processedRight = pow(scalableRight,1+2*exponentialScale);//Convert linear scale to a cubic scale using the same X value to get a different Y value on a graph
+
 
   if(abs(processedLeft) < driftoffset){
     mappedLeft = 0;
