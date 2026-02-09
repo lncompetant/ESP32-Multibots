@@ -98,39 +98,27 @@ int deadzone(int value) {  //use if your controller sucks lol
 }
 */
 void processJoysticks(ControllerPtr ctl) {
-  // Control the wheels using the joystick
-  int leftyAxis = ctl->axisY();    // Assuming this is the Y-axis for forward/backward
-  int rightxAxis = ctl->axisRX();  // Assuming this is the X-axis for left/right
-  int rightyAxis = ctl->axisRY();
-  //int RawRightYaxis = ctl->axisRY();
-  int processedRight;
-  int processedLeft;
-  int mappedRight;
-  int mappedLeft;
+  // Control the wheels using the joystick
+  int leftyAxis = ctl->axisY();    // Assuming this is the Y-axis for forward/backward
+  int rightxAxis = ctl->axisRX();  // Assuming this is the X-axis for left/right
+  float processedRight;
+  float processedLeft;
+  float mappedRight;
+  float mappedLeft;
+  float scaledLeft = pow(map(leftyAxis,-512,512,-1,1),1+2*exponentialScale);
+  float scaledRight = pow(map(rightxAxis,-512,512,-1,1),1+2*exponentialScale);
+  
+  
+  processedLeft =(scaledLeft - (scaledRight));
+  processedRight = (scaledLeft + (scaledRight)); //this is not right
 
+  if(abs(processedLeft) < driftoffset){
+    mappedLeft = 0;
+  }
 
-  processedLeft =(leftyAxis - (rightxAxis * sensitivityPercentage));
-  processedRight = (leftyAxis + (rightxAxis * sensitivityPercentage)); //this is not right
-
-  if(abs(processedLeft) < driftoffset){
-    mappedLeft = 0;
-  }
-
-  if(abs(processedRight)<driftoffset){
-    mappedRight = 0;
-  }
- 
-  
-  
-  Serial.println(processedRight);
-  Serial.println(processedLeft);
-  mappedLeft = map(processedLeft, -512, 512, 1000, 2000);
-  mappedRight = map(processedRight, -512, 512, 1000, 2000);
-
-
-  escLeft.writeMicroseconds(mappedLeft);
-  escRight.writeMicroseconds(mappedRight);
-}
+  if(abs(processedRight)<driftoffset){
+    mappedRight = 0;
+  }
 
 
 void stop() {
