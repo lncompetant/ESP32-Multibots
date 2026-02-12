@@ -37,6 +37,7 @@ void setup() {
 
   escLeft.attach(leftPin, 1000, 2000);    // Attach the ESC for the left wheel
   escRight.attach(rightPin, 1000, 2000);  // Attach the ESC for the right wheel
+  
 
   // Initialize Bluepad32
   BP32.setup(&onConnectedController, &onDisconnectedController);
@@ -133,8 +134,8 @@ void stop() {
 void armESC() {
   // Send a low signal to the ESC for arming
   Serial.println("Arming ESC...");
-  escLeft.writeMicroseconds(map(5, 0, 10, 1000, 2000));
-  escRight.writeMicroseconds(map(5, 0, 10, 1000, 2000));
+  escLeft.writeMicroseconds(1500);
+  escRight.writeMicroseconds(1500);
   delay(2000);  // Wait 2 seconds
   Serial.println("ESC armed.");
 }
