@@ -105,8 +105,8 @@ void processJoysticks(ControllerPtr ctl) {
   float processedLeft;
   float mappedRight;
   float mappedLeft;
-  float scaledLeft = pow(map(leftyAxis,-512,512,-1,1),1+2*exponentialScale);
-  float scaledRight = pow(map(rightxAxis,-512,512,-1,1),1+2*exponentialScale);
+  float scaledLeft = pow(map(leftyAxis,-512,512,-1,1),3);
+  float scaledRight = pow(map(rightxAxis,-512,512,-1,1),3);
   
   
   processedLeft =(scaledLeft - (scaledRight));
