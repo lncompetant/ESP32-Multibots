@@ -3,6 +3,7 @@
 
 Servo escLeft;    // Left wheel motor
 Servo escRight;   // Right wheel motor
+Servo escWeapon;  //Weapon motor (Bi-directional ESC)
 
 const int driftoffset = 30;  //amount to offset joystick drift by
 bool controllerConnected = false;
@@ -88,15 +89,6 @@ void onDisconnectedController(ControllerPtr ctl) {
   Serial.println("Controller disconnected");
 }
 
-/* DO NOT USE: DOES NOT FILTER OUT VALUES.  USE CONTROLLER OFFSET INSTEAD.
-int deadzone(int value) {  //use if your controller sucks lol
-  if ((1500-(abs(value)))<100) {
-    return 0;
-  } else {
-    return value;
-  }
-}
-*/
 void processJoysticks(ControllerPtr ctl) {
   // Control the wheels using the joystick
   int leftyAxis = ctl->axisY();    // Assuming this is the Y-axis for forward/backward
@@ -108,7 +100,6 @@ void processJoysticks(ControllerPtr ctl) {
   int mappedRight;
   int mappedLeft;
 
-
   processedLeft =(leftyAxis - (rightxAxis * sensitivityPercentage));
   processedRight = (leftyAxis + (rightxAxis * sensitivityPercentage)); //this is not right
 
@@ -119,8 +110,6 @@ void processJoysticks(ControllerPtr ctl) {
   if(abs(processedRight)<driftoffset){
     mappedRight = 0;
   }
- 
-  
   
   Serial.println(processedRight);
   Serial.println(processedLeft);
@@ -130,8 +119,21 @@ void processJoysticks(ControllerPtr ctl) {
 
   escLeft.writeMicroseconds(mappedLeft);
   escRight.writeMicroseconds(mappedRight);
-}
 
+  //Weapon controls
+int weaponSpeedPercentage = 0;
+  if(ctl->a()){
+    escWeapon.writeMicroseconds(1750);
+}
+  if(ctl->y()){
+    escWeapon.writeMicroseconds(2000);
+  }
+  if(ctl->b()){
+    escWeapon.writeMicroseconds(1500);
+  }
+  if(ctl->x()){
+    escWeapon.writeMicroseconds(1000);
+  }
 
 void stop() {
   escLeft.writeMicroseconds(1500);
