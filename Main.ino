@@ -13,7 +13,7 @@ bool inverted = false;
 // Motor control pins
 const int leftPin = D9;
 const int rightPin = D10;
-const int weaponPin = D8;
+const int weaponPin = D6;
 
 // Controller pointer
 ControllerPtr myControllers[BP32_MAX_GAMEPADS];
@@ -89,13 +89,11 @@ void onDisconnectedController(ControllerPtr ctl) {
   Serial.println("Controller disconnected");
 }
 
-void processButtons(ControllerPtr ctl) {
+void processButtons(ControllerPtr ctl) {  //mess with these numbers.  1000, 1500, and 2000 are the numbers you should test with since those are extrema.
   if (ctl->a()) {
-    escWeapon.writeMicroseconds(1000);
+    escWeapon.writeMicroseconds(1000);//stop
   } else if (ctl->b()) {
     escWeapon.writeMicroseconds(1500);
-  } else if (ctl->y()) {
-    escWeapon.writeMicroseconds(1750);
   } else if (ctl->x()) {
     escWeapon.writeMicroseconds(2000);
   }
