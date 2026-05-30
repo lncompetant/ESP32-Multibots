@@ -24,7 +24,8 @@ bool escArmed = false;
 // Function prototypes
 void processJoysticks(ControllerPtr ctl);
 void processButtons(ControllerPtr ctl);
-void armESC();
+void armWeaponESC();
+void armDriveESC();
 void stop();
 
 void setup() {
@@ -32,9 +33,6 @@ void setup() {
 
   pinMode(2, OUTPUT);
 
-  escLeft.attach(leftPin, 1000, 2000);    // Attach the ESC for the left wheel
-  escRight.attach(rightPin, 1000, 2000);  // Attach the ESC for the right wheel
-  escWeapon.attach(weaponPin, 1000, 2000);
 
   // Initialize Bluepad32
   BP32.setup(&onConnectedController, &onDisconnectedController);
@@ -54,7 +52,8 @@ void loop() {
     for (auto ctl : myControllers) {
       if (ctl && ctl->isConnected()) {
         if (!escArmed) {
-          armESC();
+            armDriveESC();
+            armWeaponESC();
           escArmed = true;
         }
         processJoysticks(ctl);
@@ -89,13 +88,21 @@ void onDisconnectedController(ControllerPtr ctl) {
   Serial.println("Controller disconnected");
 }
 
-void processButtons(ControllerPtr ctl) {  //mess with these numbers.  1000, 1500, and 2000 are the numbers you should test with since those are extrema.
+void processButtons(ControllerPtr ctl) {
   if (ctl->a()) {
-    escWeapon.writeMicroseconds(1000);//stop
-  } else if (ctl->b()) {
     escWeapon.writeMicroseconds(1500);
-  } else if (ctl->x()) {
-    escWeapon.writeMicroseconds(2000);
+}
+  if(ctl->x()){
+    escWeapon.writeMicroseconds(1375);
+  }
+  if(ctl->y()){
+    escWeapon.writeMicroseconds(1250);
+  }
+  if(ctl->b()){
+    escWeapon.writeMicroseconds(1125);
+  }
+  if(ctl->dpad()==0x02){
+    escWeapon.writeMicroseconds(1725);
   }
 }
 
@@ -111,8 +118,8 @@ void processJoysticks(ControllerPtr ctl) {
   int mappedLeft;
 
   // Calculate motor values based on joystick input
-  processedLeft = (leftyAxis - (rightxAxis * sensitivityPercentage));
-  processedRight = (leftyAxis + (rightxAxis * sensitivityPercentage));
+  processedLeft = (leftyAxis + (rightxAxis * sensitivityPercentage));
+  processedRight = -(leftyAxis - (rightxAxis * sensitivityPercentage));
 
   // Apply deadzone/drift offset
   if (abs(processedLeft) < driftoffset) {
@@ -143,13 +150,26 @@ void stop() {
 }
 
 // Function to arm the ESC (if necessary)
-void armESC() {
+void armDriveESC() {
   // Send a low signal to the ESC for arming
   Serial.println("Arming ESC...");
   escLeft.writeMicroseconds(1000);
   escRight.writeMicroseconds(1000);
-  escWeapon.writeMicroseconds(1000);
+
+  escLeft.attach(leftPin, 1000, 2000);    // Attach the ESC for the left wheel
+  escRight.attach(rightPin, 1000, 2000);  // Attach the ESC for the right wheel
 
   delay(2000);  // Wait 2 seconds
-  Serial.println("ESC armed.");
+  Serial.println("Drive ESC armed.");
+  
+}
+// Function to arm the ESC (if necessary)
+void armWeaponESC() {
+  // Send a low signal to the ESC for arming
+  Serial.println("Arming ESC...");
+  escWeapon.writeMicroseconds(1000);
+escWeapon.attach(weaponPin, 1000, 2000);
+
+  delay(2000);  // Wait 2 seconds
+  Serial.println("Weapon ESC armed.");
 }
